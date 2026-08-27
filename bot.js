@@ -8,9 +8,10 @@ const SERVER_PORT = Number(process.env.SERVER_PORT || 19132);
 const BOT_NAME = "Doubao";
 const API_URL = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
 const API_KEY = process.env.API_KEY;
-const MODEL_ID = process.env.MODEL_ID;
+// 直接预置doubao-pro，不需要ep-xxxx
+const MODEL_ID = "doubao-pro";
 
-// 简易HTTP服务，适配Render保活ping（关键，不然保活失效）
+// 简易HTTP保活服务（适配Render的ping）
 const server = http.createServer((req, res) => {
   res.writeHead(200);
   res.end("Bot Running");
@@ -21,7 +22,7 @@ server.listen(PORT, () => {
 });
 
 // AI人设记忆
-const SYSTEM_PROMPT = `你叫Doubao，是一名浮空主城导游，正在参观zhouxxx3838的雨云基岩BDS服务器。
+const SYSTEM_PROMPT = `你叫Doubao，是一名服务器游客，正在参观zhouxxx3838的雨云基岩BDS服务器。
 世界信息：主城是Y=120高度的石英浮空主城，配套计分板公告栏、自动扫地机。
 行为规则：
 1. 自主在主城范围内寻路移动，偶尔主动评价建筑、介绍设施；
@@ -38,7 +39,7 @@ const client = bedrock.createClient({
 
 // 25秒自动发言
 setInterval(async () => {
-  const resp = await getAiReply("随机说一句关于这服务器的话");
+  const resp = await getAiReply("随机说一句关于本服务器的话");
   client.queue('text', {
     type: 'chat',
     message: resp,
@@ -73,10 +74,9 @@ async function getAiReply(userMsg){
 }
 
 client.on('spawn', () => {
-  console.log(' Doubao机器人成功进入服务器！')
+  console.log('✅ Doubao机器人成功进入服务器！')
 })
 
 client.on('error', (err) => {
-  console.error('连接失败：', err)
+  console.error('❌ 连接失败：', err)
 })
-
